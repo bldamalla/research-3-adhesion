@@ -16,12 +16,43 @@ end
 Get the direction of greater variance given an image histogram and a test threshold
 """
 function var_dir(hist::FrequencyWeights; thresh::Int)
+  # always assume that variance increases in one direction relative to a threshold
   curr_thresh = intervar(hist, thresh=thresh)
+
+  # if variance is higher to the right
   if intervar(hist, thresh=thresh+1) > curr_thresh
     return 1
+
+  # else if variance is higher to the left
   elseif intervar(hist, thresh=thresh-1) > curr_thresh
     return -1
+
+  # else (variance is maxed at threshold) return still
   else
     return 0
   end
+end
+
+"""
+Original Otsu's method implementation with breaking on max
+"""
+function otsu_thresh_break(hist::FrequencyWeights)
+  curr_max = 0; thresh = 0
+  # iterate over the whole length of the histogram
+  for curr in 1:length(hist)
+    t_curr = intervar(hist, thresh=curr)
+
+    # if the calculated threshold is larger than current maximum
+    # update threshold and current maximum
+    if t_curr > curr_max
+      thresh = curr
+      curr_max = t_curr
+
+    # assuming concavity around the threshold
+    # break at maximum
+    else
+      break
+    end
+  end
+  return thresh
 end
