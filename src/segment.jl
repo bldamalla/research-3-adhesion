@@ -56,3 +56,27 @@ function otsu_thresh_break(hist::FrequencyWeights)
   end
   return thresh
 end
+
+"""
+Implementation of Alsaeed (2016) algorithm for Otsu-Checkpoints
+"""
+function alsaeed_otsu(hist::FrequencyWeights)
+  bins = vec(1:length(hist))
+
+  # set the first thresholds
+  curr = μ_T = Int(floor(StatsBase.mean(bins, hist)))
+  μ_0 = Int(floor(StatsBase.mean(bins[1:μ_T], fweights(hist[1:μ_T]))))
+  μ_1 = Int(floor(StatsBase.mean(bins[μ_T:end], fweights(hist[μ_T:end]))))
+
+  # get the direction with respect to the global mean
+  dir = var_dir(hist, thresh=μ_T)
+
+  # set up initial reduced histogram
+  if dir == 0
+    return μ_T
+  elseif dir < 0
+    r_hist = fweights(hist[μ_0:μ_T])
+  else
+    rhist = fweights(hist[μ_T:μ_1])
+  end
+end
