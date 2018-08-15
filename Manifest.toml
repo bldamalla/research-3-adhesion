@@ -97,6 +97,12 @@ version = "0.3.0"
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
+[[MultivariateStats]]
+deps = ["Compat", "StatsBase"]
+git-tree-sha1 = "31da6bdd83d286b35064d1196bdba38f6dd25384"
+uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
+version = "0.5.0"
+
 [[NaNMath]]
 deps = ["Compat"]
 git-tree-sha1 = "ce3b85e484a5d4c71dd5316215069311135fa9f2"
@@ -120,10 +126,10 @@ uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "0.5.2"
 
 [[Plots]]
-deps = ["Base64", "Contour", "Dates", "FixedPointNumbers", "GR", "JSON", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Printf", "REPL", "RecipesBase", "Reexport", "Requires", "Showoff", "StaticArrays", "Statistics", "StatsBase", "Test", "UUIDs"]
-git-tree-sha1 = "c8e727ba8170f431e7581065bf92c26014d20bd2"
+deps = ["Base64", "Contour", "Dates", "FixedPointNumbers", "GR", "JSON", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Printf", "REPL", "RecipesBase", "Reexport", "Requires", "Showoff", "SparseArrays", "StaticArrays", "Statistics", "StatsBase", "Test", "UUIDs"]
+git-tree-sha1 = "11d668ff24983dd998e264488f4a91a06e11760f"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "0.19.1"
+version = "0.19.2"
 
 [[Printf]]
 deps = ["Unicode"]
