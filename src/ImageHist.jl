@@ -3,23 +3,24 @@
 import Base: length, eltype, similar
 import Base: getindex, setindex!, firstindex, lastindex
 
-mutable struct ImageHist
+struct ImageHist
   data::Array{Int, 1}
   s_idx::Int
   sz::Int
 
-  ImageHist(data, s_idx, sz) = (sz != sum(data)) ? error("sz must hold the sum of elements of passed data array") : new(data, s_idx, sz) ;
+  ImageHist(data, s_idx, sz) = (sz != sum(data)) ? throw(ErrorException("sz should be the sum of elements in data")) : new(data, s_idx, sz) ;
 end
 
 ImageHist(data::Array{Int, 1}, s_idx::Int) = ImageHist(data, s_idx, sum(data))
 ImageHist(data::Array{Int, 1}) = ImageHist(data, 1, sum(data))
 
-length(hist::ImageHist) = hist.sz
+length(hist::ImageHist) = length(hist.data)
 eltype(::ImageHist) = Int
 similar(hist::ImageHist) = ImageHist(similar(hist.data), hist.s_idx)
 
-getindex(hist::ImageHist, i::Int) = getindex(hist.data, i)
-setindex!(hist::ImageHist, v::Int, i::Int) = setindex!(hist.data, v, i)
+firstindex(hist::ImageHist) = hist.s_idx
+lastindex(hist::ImageHist) = firstindex(hist)+length(hist.data)-1
 
-firstindex(hist::ImageHist) = 1
-lastindex(hist::ImageHist) = length(hist)
+getindex(hist::ImageHist, i::Int) = getindex(hist.data, i-firstindex(hist)+1)
+getindex(hist::ImageHist, i::UnitRange{Int}) = ImageHist(hist.data[i], firstindex(hist)+first(i)-1)
+setindex!(hist::ImageHist, v::Int, i::Int) = setindex!(hist.data, v, i)
