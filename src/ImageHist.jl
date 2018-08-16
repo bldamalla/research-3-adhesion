@@ -24,3 +24,11 @@ lastindex(hist::ImageHist) = firstindex(hist)+length(hist.data)-1
 getindex(hist::ImageHist, i::Int) = getindex(hist.data, i-firstindex(hist)+1)
 getindex(hist::ImageHist, i::UnitRange{Int}) = ImageHist(hist.data[i], firstindex(hist)+first(i)-1)
 setindex!(hist::ImageHist, v::Int, i::Int) = setindex!(hist.data, v, i)
+
+function mean(hist::ImageHist)
+  ret = 0
+  for i in firstindex(hist) : lastindex(hist)
+    @inbounds ret += hist[i] * (i-firstindex(hist)+1) / hist.sz
+  end
+  return ret
+end
