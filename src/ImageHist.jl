@@ -22,7 +22,7 @@ firstindex(hist::ImageHist) = hist.s_idx
 lastindex(hist::ImageHist) = firstindex(hist)+length(hist.data)-1
 
 getindex(hist::ImageHist, i::Int) = getindex(hist.data, i-firstindex(hist)+1)
-getindex(hist::ImageHist, i::UnitRange{Int}) = ImageHist(hist.data[i], firstindex(hist)+first(i)-1)
+getindex(hist::ImageHist, i::UnitRange{Int}) = ImageHist(getindex(hist.data, i.-firstindex(hist).+1), first(i))
 setindex!(hist::ImageHist, v::Int, i::Int) = setindex!(hist.data, v, i)
 
 function mean(hist::ImageHist)
