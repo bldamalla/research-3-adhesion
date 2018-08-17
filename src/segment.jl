@@ -1,12 +1,12 @@
-using StatsBase
+include("./ImageHist.jl")
 
 """
 Get the interclass variance of two groups split at a threshold
 """
-function intervar(hist::FrequencyWeights; thresh::Int)
-  ω_0 = fweights(hist[1:thresh]).sum / hist.sum
-  μ_T = StatsBase.mean(vec(1:length(hist)), hist) / hist.sum
-  μ_0 = StatsBase.mean(vec(1:thresh), fweights(hist[1:thresh])) / hist.sum
+function intervar(hist::ImageHist; thresh::Int)
+  ω_0 = hist[1:thresh].sz / hist.sz
+  μ_T = mean(hist) / hist.sz
+  μ_0 = mean(hist[1:thresh]) / hist.sz
   μ_1 = (μ_T - ω_0*μ_0) / (1-ω_0)
 
   return (ω_0 * (1-ω_0)) * ((μ_0 - μ_1)^2)
@@ -15,7 +15,7 @@ end
 """
 Get the direction of greater variance given an image histogram and a test threshold
 """
-function var_dir(hist::FrequencyWeights; thresh::Int)
+function var_dir(hist::ImageHist; thresh::Int)
   # always assume that variance increases in one direction relative to a threshold
   curr_thresh = intervar(hist, thresh=thresh)
 
@@ -36,7 +36,7 @@ end
 """
 Original Otsu's method implementation with breaking on max
 """
-function otsu_thresh_break(hist::FrequencyWeights)
+function otsu_thresh_break(hist::ImageHist)
   curr_max = 0; thresh = 0
   # iterate over the whole length of the histogram
   for curr in 1:length(hist)
