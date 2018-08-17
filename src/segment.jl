@@ -60,23 +60,63 @@ end
 """
 Implementation of Alsaeed (2016) algorithm for Otsu-Checkpoints
 """
-function alsaeed_otsu(hist::FrequencyWeights)
-  bins = vec(1:length(hist))
+function alsaeed_otsu(hist::ImageHist)
+  # get the necessary histogram means
+  μ_T = Int(floor(mean(hist)))
+  μ_0 = Int(floor(mean(hist[1:μ_T])))
+  μ_1 = Int(floor(mean(hist[μ_T:end])))
 
-  # set the first thresholds
-  curr = μ_T = Int(floor(StatsBase.mean(bins, hist)))
-  μ_0 = Int(floor(StatsBase.mean(bins[1:μ_T], fweights(hist[1:μ_T]))))
-  μ_1 = Int(floor(StatsBase.mean(bins[μ_T:end], fweights(hist[μ_T:end]))))
-
-  # get the direction with respect to the global mean
+  # determine the direction wrt global mean of greater variance
   dir = var_dir(hist, thresh=μ_T)
 
-  # set up initial reduced histogram
-  if dir == 0
-    return μ_T
+  # define local histogram reduction function
+  function alsaeed_recursive(r_hist::ImageHist)
+    # define special pointers
+    l = firstindex(r_hist)
+    r = lastindex(r_hist)
+    md = (l+r) >> 1
+
+    # define other "quartiles"
+    qt1 = (l+md) >> 1
+    qt3 = (md+r) >> 1
+
+    # define recursion cases
+
+    # if variance direction from median is to the right
+    r_dir = var_dir(hist, thresh=md)
+    if r_dir > 0
+      # test direction from third quartile
+      r_dir = var_dir(hist, thresh=qt3)
+      if r_dir > 0
+        return alsaeed_recursive(r_hist[qt3:r])
+      elseif r_dir < 0
+        return alsaeed_recursive(r_hist[md:qt3])
+      else
+        return qt3
+      end
+    elseif r_dir < 0
+      # test direction from first quartile
+      r_dir = var_dir(hist, thresh=qt1)
+      if r_dir > 0
+        return alsaeed_recursive(r_hist[qt1:md])
+      elseif r_dir < 0
+        return alsaeed_recursive(r_hist[l:qt1])
+      else
+        return qt1
+      end
+    else
+      return md
+    end
+  end
+
+  # determine histogram to apply recusrive function to
+  if dir > 0
+    # apply recursive function from global to positive mean
+    return alsaeed_recursive(hist[μ_T:μ_1])
   elseif dir < 0
-    r_hist = fweights(hist[μ_0:μ_T])
-  else
-    rhist = fweights(hist[μ_T:μ_1])
+    # apply recursive function from negative mean to global mean
+    return alsaeed_recursive(hist[μ_0:μ_T])
+  else 
+    return μ_T
   end
 end
