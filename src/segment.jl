@@ -116,7 +116,7 @@ function alsaeed_otsu(hist::ImageHist)
   elseif dir < 0
     # apply recursive function from negative mean to global mean
     return alsaeed_recursive(hist[μ_0:μ_T])
-  else 
+  else
     return μ_T
   end
 end
