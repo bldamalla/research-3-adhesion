@@ -20,3 +20,8 @@ function fft(ens::Ensemble)
   end
   return holder
 end
+
+function two_pt_stat(ens::Ensemble)
+  mn = mean(fft(ens))
+  return real(ifft(mn))
+end
