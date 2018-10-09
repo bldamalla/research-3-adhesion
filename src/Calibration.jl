@@ -37,4 +37,16 @@ function tmr_routine(data::DataFrame)
   return model
 end
 
-# calibrate timer positions
+# solve for the resistances using calibrated voltage from prev models
+function solve_resistances(ratio::Vector{T}) where T <: AbstractFloat
+  # define the coefficient matrix
+  # none of the ratios should be 0
+  coeff_matrix = [
+  1 1 -1/ratio[1]
+  1 -1/ratio[2] 1
+  -1/ratio[3] 1 1
+  ]
+  # use backsolve? to solve for the reciprocal of the resistances
+  recip = coeff_matrix \ zeros(T, 3)
+  return 1 ./ recip
+end
