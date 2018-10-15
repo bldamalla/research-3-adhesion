@@ -227,6 +227,12 @@ git-tree-sha1 = "0e4cc77fb131061b3525a97fd7d483b253c3aaad"
 uuid = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 version = "0.7.1"
 
+[[ImageMagick]]
+deps = ["BinaryProvider", "ColorTypes", "FileIO", "FixedPointNumbers", "ImageCore", "InteractiveUtils", "Libdl", "Pkg", "Random", "Test"]
+git-tree-sha1 = "0e4cc77fb131061b3525a97fd7d483b253c3aaad"
+uuid = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
+version = "0.7.1"
+
 [[ImageMetadata]]
 deps = ["AxisArrays", "ColorVectorSpace", "Colors", "Dates", "FixedPointNumbers", "ImageAxes", "ImageCore", "IndirectArrays", "Statistics", "Test"]
 git-tree-sha1 = "e8763955937114ea15cf3bfb5ae00588e19b58c3"
@@ -418,6 +424,12 @@ deps = ["ColorTypes", "ColorVectorSpace", "FileIO", "FixedPointNumbers", "ImageC
 git-tree-sha1 = "33dccde77cddfbbf3fe9dbf3b92d2459260368fa"
 uuid = "dca85d43-d64c-5e67-8c65-017450d5d020"
 version = "0.5.2"
+
+[[QuartzImageIO]]
+deps = ["ColorTypes", "ColorVectorSpace", "FileIO", "FixedPointNumbers", "ImageCore", "Libdl", "Random", "Test"]
+git-tree-sha1 = "c747a56f223919b157e6cd9dc58d59c560586302"
+uuid = "dca85d43-d64c-5e67-8c65-017450d5d020"
+version = "0.5.0"
 
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets"]
