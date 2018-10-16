@@ -175,9 +175,6 @@ git-tree-sha1 = "481e4db939f005db39f7296599d0543c0744fe30"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 version = "1.0.2"
 
-[[FileWatching]]
-uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
-
 [[FixedPointNumbers]]
 deps = ["Pkg", "Test"]
 git-tree-sha1 = "b8045033701c3b10bf2324d7203404be7aef88ba"
@@ -340,12 +337,6 @@ version = "0.2.1"
 [[Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
-
-[[MbedTLS]]
-deps = ["BinaryProvider", "Libdl", "Pkg", "Random", "Sockets", "Test"]
-git-tree-sha1 = "3775d205b09b624aa06d39012a8920ba99cb3b8b"
-uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
-version = "0.6.3"
 
 [[Measures]]
 deps = ["Pkg", "Test"]
@@ -533,12 +524,6 @@ version = "0.8.0"
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
-[[SoftGlobalScope]]
-deps = ["Test"]
-git-tree-sha1 = "97f6dfcf612b9a7260fde44170725d9ea34b1431"
-uuid = "b85f4697-e234-5449-a836-ec8e2f98b302"
-version = "1.0.7"
-
 [[SortingAlgorithms]]
 deps = ["DataStructures", "Random", "Test"]
 git-tree-sha1 = "03f5898c9959f8115e30bc7226ada7d0df554ddd"
@@ -651,9 +636,3 @@ deps = ["LinearAlgebra", "Random", "SparseArrays", "Test"]
 git-tree-sha1 = "21772c33b447757ec7d3e61fcdfb9ea5c47eedcf"
 uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
 version = "0.4.1"
-
-[[ZMQ]]
-deps = ["BinaryProvider", "FileWatching", "Libdl", "Sockets", "Test"]
-git-tree-sha1 = "34e7ac2d1d59d19d0e86bde99f1f02262bfa1613"
-uuid = "c2297ded-f4af-51ae-bb23-16f91089e4e1"
-version = "1.0.0"
