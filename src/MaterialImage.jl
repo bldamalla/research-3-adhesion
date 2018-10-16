@@ -7,37 +7,27 @@ import Base: size
 import Statistics: mean
 
 struct MaterialImage
-  data::Vector{T} where {T<:AbstractFloat}
-  dims::NTuple{2, Int}
+  data::Array{T, 2} where {T<:AbstractFloat}
   discs::Int
 
-  MaterialImage(data, dims, discs) = begin
-    if prod(dims) != length(data)
-      throw(DimensionMismatch("data cannot be converted to dimension dims"))
-    elseif discs < 2
+  MaterialImage(data, discs) = begin
+    if discs < 2
       throw(ErrorException("there should be at least two discrete local states"))
     else
-      return new(data, dims, discs)
+      return new(data, discs)
     end
   end
 end
 
-function MaterialImage(data::Array{T, 2}, discs::Int) where {T<:AbstractFloat}
-  return MaterialImage(vec(data), size(data), discs)
-end
-size(img::MaterialImage) = img.dims
-eltype(img::MaterialImage) = Dict{Symbol, Union{Int, NTuple{2, Int}}}(:dims=>size(img), :discs=>img.discs)
-getindex(img::MaterialImage, i::Int) = getindex(img.data, i)
+size(img::MaterialImage) = size(img.data)
+length(img::MaterialImage) = length(img.data)
+getindex(img::MaterialImage, u1::UnitRange{Int}, u2::UnitRange{Int}) = MaterialImage(img[u1,u2], img.discs)
 function mean(img::MaterialImage)
   return mean(img.data)
 end
 
 Ensemble = Vector{MaterialImage}
 
-function eltype(ens::Ensemble)
-  if length(ens) < 1 throw(ErrorException("ensemble is empty")) end
-  return eltype(ens[1])
-end
 function mean(ens::Ensemble)
   length(ens) == 0 && throw(ErrorException("ensemble has no elements"))
   sm = zeros(length(ens[1].data))
