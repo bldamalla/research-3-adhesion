@@ -28,6 +28,16 @@ end
 
 Ensemble = Vector{MaterialImage}
 
+function Ensemble(img::MaterialImage; N=300::Int)
+  ret = Ensemble()
+  szx, szy = size(img); padx, pady = floor.(size(img) ./ 8)
+  for i in 1:N
+    thx = rand(1:szx-padx); thy = rand(1:szy-pady)
+    push!(ret, img[thx:thx+padx-1,thy:thy+pady-1])
+  end
+  return ret
+end
+
 function mean(ens::Ensemble)
   length(ens) == 0 && throw(ErrorException("ensemble has no elements"))
   sm = zeros(length(ens[1].data))
