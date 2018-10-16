@@ -1,17 +1,6 @@
 include("./ImageHist.jl")
 
 """
-Get the image histogram for a loaded array
-"""
-function imagehist(arr::Vector{T}) where T<:AbstractFloat
-  ret = zeros(Int, 256)
-  for i in arr
-    ret[Int(ceil(i*256))] += 1
-  end
-  return ImageHist(ret)
-end
-
-"""
 Get the interclass variance of two groups split at a threshold
 """
 function intervar(hist::ImageHist; thresh::Int)

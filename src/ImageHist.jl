@@ -1,5 +1,7 @@
 # type definition for image histograms
 
+include("./MaterialImage.jl")
+
 import Base: length, eltype, similar
 import Base: getindex, setindex!, firstindex, lastindex
 
@@ -14,6 +16,14 @@ end
 ImageHist(data::Array{Int, 1}, s_idx::Int) = ImageHist(data, s_idx, sum(data))
 ImageHist(data::Array{Int, 1}) = ImageHist(data, 1, sum(data))
 
+function ImageHist(data::MaterialImage)
+  ret = zeros(Int, 256)
+  for i in data.data
+    ret[Int(ceil(i*256))] += 1
+  end
+  return ImageHist(ret)
+end
+
 length(hist::ImageHist) = length(hist.data)
 eltype(::ImageHist) = Int
 similar(hist::ImageHist) = ImageHist(similar(hist.data), hist.s_idx)
@@ -26,9 +36,9 @@ getindex(hist::ImageHist, i::UnitRange{Int}) = ImageHist(getindex(hist.data, i.-
 setindex!(hist::ImageHist, v::Int, i::Int) = setindex!(hist.data, v, i)
 
 function mean(hist::ImageHist)
-  ret = 0
+  ret = 0.0
   for i in firstindex(hist) : lastindex(hist)
-    @inbounds ret += hist[i] * (i-firstindex(hist)+1) / hist.sz
+    @inbounds ret += hist[i] * i / hist.sz
   end
   return ret
 end
