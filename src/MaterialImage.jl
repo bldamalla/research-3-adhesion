@@ -1,6 +1,6 @@
 # type definition for Images and Ensembles
 
-import Base: getindex, firstindex, lastindex, eltype
+import Base: getindex, firstindex, lastindex, eltype, setindex!
 import Base: push!, length
 import Base: size
 
@@ -21,30 +21,29 @@ end
 
 size(img::MaterialImage) = size(img.data)
 length(img::MaterialImage) = length(img.data)
-getindex(img::MaterialImage, u1::UnitRange{Int}, u2::UnitRange{Int}) = MaterialImage(img[u1,u2], img.discs)
+getindex(img::MaterialImage, i::Int) = getindex(img.data, i)
+getindex(img::MaterialImage, u1::UnitRange{Int}, u2::UnitRange{Int}) = MaterialImage(img.data[u1,u2], img.discs)
+setindex!(img::MaterialImage, v::T, i::Int) where T<:AbstractFloat = setindex!(img.data, v, i)
 function mean(img::MaterialImage)
   return mean(img.data)
 end
 
-Ensemble = Vector{MaterialImage}
-
 function Ensemble(img::MaterialImage; N=300::Int)
-  ret = Ensemble()
-  szx, szy = size(img); padx, pady = floor.(size(img) ./ 8)
+  ret = Vector{MaterialImage}()
+  szx, szy = size(img); padx, pady = (61, 61)
   for i in 1:N
-    thx = rand(1:szx-padx); thy = rand(1:szy-pady)
+    thx = rand(1:szx-padx+1); thy = rand(1:szy-pady+1)
     push!(ret, img[thx:thx+padx-1,thy:thy+pady-1])
   end
   return ret
 end
 
-function mean(ens::Ensemble)
-  length(ens) == 0 && throw(ErrorException("ensemble has no elements"))
-  sm = zeros(length(ens[1].data))
+function mean(ens::Vector{MaterialImage})
+  ret = MaterialImage(zeros(size(ens[1].data)), ens[1].discs)
   for i in 1:length(ens)
     for j in 1:length(ens[1].data)
-      @inbounds sm[j] += ens[i][j] / length(ens)
+      ret[j] += ens[i][j] / length(ens)
     end
   end
-  return MaterialImage(sm, ens[1].dims, ens[1].discs)
+  return ret
 end
