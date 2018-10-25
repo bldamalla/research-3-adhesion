@@ -28,6 +28,13 @@ function mean(img::MaterialImage)
   return mean(img.data)
 end
 
+function pad!(img::MaterialImage)
+end
+
+function mask(img::MaterialImage)
+  return img
+end
+
 function Ensemble(img::MaterialImage; N=300::Int)
   ret = Vector{MaterialImage}()
   szx, szy = size(img); padx, pady = (61, 61)
