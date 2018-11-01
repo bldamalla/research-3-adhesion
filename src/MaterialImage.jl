@@ -45,6 +45,17 @@ function Ensemble(img::MaterialImage; N=300::Int)
   return ret
 end
 
+function StructureMatrix(i_ens::Array{MaterialImage, 2})
+  ret = similar(i_ens, Vector{MaterialImage})
+  szx, szy = size(i_ens)
+  for i in 1:szx
+    for j in 1:szy
+      ret[i,j] = Ensemble(i_ens[i,j])
+    end
+  end
+  return ret
+end
+
 function mean(ens::Vector{MaterialImage})
   ret = MaterialImage(zeros(size(ens[1].data)), ens[1].discs)
   for i in 1:length(ens)
