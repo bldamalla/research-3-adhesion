@@ -35,9 +35,9 @@ function mask(img::MaterialImage)
   return img
 end
 
-function Ensemble(img::MaterialImage; N=300::Int)
+function Ensemble(img::MaterialImage; N=300::Int, S=201)
   ret = Vector{MaterialImage}()
-  szx, szy = size(img); padx, pady = (61, 61)
+  szx, szy = size(img); padx, pady = (S, S)
   for i in 1:N
     thx = rand(1:szx-padx+1); thy = rand(1:szy-pady+1)
     push!(ret, img[thx:thx+padx-1,thy:thy+pady-1])
