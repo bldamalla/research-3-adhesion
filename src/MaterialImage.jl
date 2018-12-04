@@ -35,7 +35,7 @@ function mask(img::MaterialImage)
   return img
 end
 
-function Ensemble(img::MaterialImage; N=300::Int, S=201)
+function Ensemble(img::MaterialImage; N=300::Int, S=201::Int)
   ret = Vector{MaterialImage}()
   szx, szy = size(img); padx, pady = (S, S)
   for i in 1:N
