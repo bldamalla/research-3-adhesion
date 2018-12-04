@@ -5,16 +5,24 @@ This will be the main entry file for the calculation of the StructureMatrix obje
 # load the needed packages
 using Images
 
+using Base.Cartesian
+
 # include all material structure definition and functions
 include("../src/segment.jl")
 
-# generate initial model image matrix
-imgs = [string("../data/test/microscope/s1/topleft/", i < 10 ? "0" : "", i, ".JPG") for i in 0:11]
+# extension generation function
+covv(a::Int) = (a >= 100) ? "$(a)" : ((a >= 10) ? "0$(a)" : "00$(a)")
 
-# generate MaterialImage objects
-imgs = load.(imgs)
-mat_imgs = [float.(Gray.(imgs[i])) for i in 1:12]
-mat_imgs = MaterialImage.(mat_imgs, 2)
+# generate string placeholder matrices for the images
+@nexprs 3 i -> imgs_i = [string("./data/actual/HPO/s$(i)/$(j)/IMG00$(covv(a)).JPG") for j in 1:4 for a in 1:45]
 
-# generate StructureMatrix
-struct_mat = StructureMatrix(reshape(mat_imgs, 3, :))
+@nexprs 3 i -> imgs_i = reshape(imgs_i, 45, 2, 2)
+
+# split into multiple tasks
+# objects in the first dimension can be treated as homogeneous
+@nexprs 3 i -> imgs_i = load.(imgs_i)
+@nexprs 3 i -> mat_imgs_i = reshape([float.(Gray.(imgs_i[j])) for j in 1:180], 45, 2, 2)
+@nexprs 3 i -> mat_imgs_i = MaterialImage.(mat_imgs_i, 2)
+
+# generate structure matrices from collections of material images
+@nexprs 3 i -> mat_imgs_ens_i = Ensemble.(mat_imgs_i)
