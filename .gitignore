@@ -1,3 +1,4 @@
 src/main.jl
 data/
 .DS_Store
+plots
