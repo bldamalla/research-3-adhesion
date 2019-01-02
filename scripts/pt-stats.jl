@@ -6,31 +6,64 @@ Depending on the use case, the calculation of StructureMatrix objects may be ski
 
 # calculate the StructureMatrix objects
 # comment out if it has already been calculated
-# include("struct-mat.jl")
+include("struct-mat.jl")
 
 # load the necessary packages
-# using Plots; gr()
+using Plots; gr()
 
 # include point statistics calculation function definitions
 include("../src/pt-stats.jl")
 
-# calculate one-pt statistics
-@nexprs 3 i -> mat_one_pt_i = one_pt_stat.(mat_imgs_ens_i)
+# collect all one point stats here
+evone = Vector{Float64}()
 
-# calculate two-pt statistics
-@nexprs 3 i -> mat_two_pt_i = two_pt_stat.(mat_imgs_ens_i)
-
-# stitch two point statistics together
-@nexprs 3 i -> struct_mat_i = reshape([hcat(mat_two_pt_i[:,j,k]...) for j in 1:2 for k in 1:2], 2, 2)
-
-# using MultivariateStats
-
-@nexprs 4 i -> mdl_i = fit(PCA, hcat(struct_mat_1[i], struct_mat_2[i], struct_mat_3[i]))
-
-function plot_save(a::Vector{T}, b::Vector{T}, c::Vector{T}, i::Int) where T <: AbstractFloat
-  ll = (length(a) == length(b) == length(c)) ? length(a) : error("Vectors should be of the same length")
-  scatter(a, zeros(ll)); scatter!(b, ones(ll)); scatter!(c, ones(ll).*2)
-  savefig("sv$(i).png")
+# calculate the point statistics of the ensembles
+@nexprs 3 i -> begin
+  @nexprs 4 j -> begin
+    one_pt_i_j = one_pt_stat(ens_i_j)
+    two_pt_i_j, two_pt_i_j_ave = two_pt_stat(ens_i_j)
+    push!(evone, one_pt_i_j)
+  end
 end
 
-@nexprs 4 i -> plot_save(vec(transform(mdl_i, struct_mat_1[i])), vec(transform(mdl_i, struct_mat_2[i])), vec(transform(mdl_i, struct_mat_3[i])), i)
+# compare the point statistics of the ensembles
+one_pt = bar(evone)
+savefig(one_pt, "./plots/evone.png")
+
+@nexprs 3 i -> begin
+  @nexprs 4 j -> begin
+    tpt_i_j = contour(-112:112, -112:112, reshape(two_pt_i_j_ave, 225, 225))
+    savefig(tpt_i_j, "./plots/two_pts/two_pt_$(i)_$(j).png")
+  end
+end
+
+using MultivariateStats, LinearAlgebra
+
+# create the PCA models
+@nexprs 4 i -> begin
+  cmpr_i = hcat(two_pt_1_i, two_pt_2_i, two_pt_3_i)
+  mdl_i = fit(PCA, cmpr_i, maxoutdim=2)
+end
+
+# create the plots and identify the variances
+@nexprs 4 i -> begin
+  val = transform(mdl_i, cmpr_i)
+  q = val[:,1:60]
+  scatter(val[2,1:60], val[1,1:60])
+  eval(Meta.parse("R2_$(i)_1 = $(tr(q' * q))"))
+  q = val[:,61:120]
+  scatter!(val[2,61:120], val[1,61:120])
+  eval(Meta.parse("R2_$(i)_2 = $(tr(q' * q))"))
+  q = val[:,121:180]
+  scatter!(val[2,121:180], val[1,121:180])
+  eval(Meta.parse("R2_$(i)_3 = $(tr(q' * q))"))
+
+  savefig("plots/PCA/mdl_$(i).png")
+end
+
+@nexprs 4 j -> begin
+  @nexprs 3 i -> begin
+    println("R2_$(j)_$(i) = ", R2_j_i)
+  end
+  println()
+end
