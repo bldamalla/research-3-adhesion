@@ -1,4 +1,6 @@
 # n-point statistics
+using Distributed
+
 include("./MaterialImage.jl")
 
 import FFTW: plan_fft, fft, ifft
@@ -22,26 +24,27 @@ end
 Perform fft on ensemble
 """
 function fft(ens::Vector{MaterialImage})
-  holder = Vector{Vector{Complex{Float64}}}()
   plan = plan_fft(ens)
-  for i in 1:length(ens)
-    push!(holder, plan * vec(ens[i].data))
+  return @distributed (hcat) for i in ens
+    plan * vec(i.data)
   end
-  return mean(holder)
 end
 
 """
 Get the two-pt statistics on Ensemble data
 """
 function two_pt_stat(ens::Vector{MaterialImage})
-  ft_ens = fft(ens); cc = conj(ft_ens)
+  ft_ens = fft(ens); cc = conj.(ft_ens)
   # convolution theorem produces asymmetric vector
-  off_center = real(ifft(ft_ens .* cc)) ./ length(ens[1].data)
+  off_center = real(ifft(ft_ens .* cc, 1)) ./ size(ft_ens, 1)
   ret = similar(off_center)
+  len = size(ret, 1)
   # assume odd length for return vector
-  shift = div(length(ret), 2)
-  for i in 1:length(ret)
-    ret[(shift+i) % length(ret) == 0 ? length(ret) : ((shift+i) % length(ret))] = off_center[i]
+  shift = div(len, 2)
+  for i in 1:len
+    for j in 1:size(ret, 2)
+      ret[(shift+i) % len == 0 ? len : ((shift+i) % len),j] = off_center[i,j]
+    end
   end
-  return ret
+  return ret, mean(ret, dims=2)
 end
