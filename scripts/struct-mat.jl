@@ -2,10 +2,10 @@
 This will be the main entry file for the calculation of the StructureMatrix objects.
 """
 
-# load the needed packages
-using Images
+using Pkg
+Pkg.activate(".")
 
-using Base.Cartesian
+using Images, SharedArrays
 
 include("../src/MaterialImage.jl")
 
@@ -70,32 +70,48 @@ images = [
   (3, 1, 8),
   (3, 2, 17),
   (3, 3, 38),
-  (3, 4, 12)
+  (3, 4, 3)
 ]
 
-val = nothing
-
-function parse_load(arg::NTuple{3,Int})
-  i, j, k = arg
-  global val
-
-  vnm = "s_$(i)_$(j)"
-
-  val = float.(Images.Gray.(Images.load("../../c++/research/data/actual/HPO/s$(i)/$(j)/IMG00$(covv(k)).JPG")))
-
-  eval(Meta.parse("$(vnm) = val"))
-end
-
-for img in images
-  parse_load(img)
-end
-
-q = 0;
-
-@nexprs 3 i -> begin
-  @nexprs 4 j -> begin
-    q = otsu_threshold(s_i_j)
-    img_i_j = MaterialImage(ceil.(q .- s_i_j), 2)
-    ens_i_j = Ensemble(img_i_j, N=60, S=225)
+function segment!(img::Array{T, 2}) where T <: AbstractFloat
+  q = otsu_threshold(img)
+  x, y = size(img)
+  for i in 1:x
+    for j in 1:y
+      img[i,j] = ceil(q - img[i,j])
+    end
   end
 end
+
+function parse_load(arg::NTuple{3, Int})
+  i, j, k = arg
+
+  img = float.(Images.Gray.(Images.load("./data/actual/HPO/s$(i)/$(j)/IMG00$(covv(k)).JPG")))
+
+  segment!(img)
+
+  return Ensemble(MaterialImage(img, 2); N=60, S=225)
+end
+
+ENSEMBLES = map(parse_load, images)
+
+cf = [[1, 2, 3, 4],
+  [2, 1, 4, 3],
+  [4, 3, 2, 1],
+  [3, 4, 1, 2]]
+
+ARR_MATRIX = hcat([vcat(cf[i], cf[j], cf[k]) for i in 1:4 for j in 1:4 for k in 1:4]...)
+
+"""
+ACCESSORIES FROM pt-stats.jl
+"""
+
+# load the necessary packages
+using Plots; gr()
+using Base.Cartesian
+
+using MultivariateStats, LinearAlgebra
+# include point statistics calculation function definitions
+include("../src/pt-stats.jl")
+
+vars = SharedArray{Float64}(12, 64)
