@@ -71,15 +71,4 @@ tk = @distributed for f in 1:64 ### START OF MAIN FOR LOOP
 
 end ### END MAIN PLOT LOOP
 
-while !(istaskdone(tk))
-  nothing
-end
-
-vars = reshape(vars, :, 64)
-
-for i in 1:64
-  bar(vars[:,i])
-  savefig("plots/R2/$(i).png")
-end
-
-println("Least variance is found at config: ", sortperm(vec(sum(vars, dims=1)))[1])
+println(tk)

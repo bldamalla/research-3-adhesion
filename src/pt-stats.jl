@@ -1,6 +1,4 @@
 # n-point statistics
-using Distributed
-
 include("./MaterialImage.jl")
 
 import FFTW: plan_fft, fft, ifft
@@ -25,8 +23,7 @@ Perform fft on ensemble
 """
 function fft(ens::Vector{MaterialImage})
   plan = plan_fft(ens)
-  return @distributed (hcat) for i in ens
-    plan * vec(i.data)
+  return hcat([plan * vec(i.data) for i in ens]...)
   end
 end
 
