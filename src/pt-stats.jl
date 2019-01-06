@@ -24,7 +24,6 @@ Perform fft on ensemble
 function fft(ens::Vector{MaterialImage})
   plan = plan_fft(ens)
   return hcat([plan * vec(i.data) for i in ens]...)
-  end
 end
 
 """
@@ -40,7 +39,7 @@ function two_pt_stat(ens::Vector{MaterialImage})
   shift = div(len, 2)
   for i in 1:len
     for j in 1:size(ret, 2)
-      ret[(shift+i) % len == 0 ? len : ((shift+i) % len),j] = off_center[i,j]
+      @inbounds ret[(shift+i) % len == 0 ? len : ((shift+i) % len),j] = off_center[i,j]
     end
   end
   return ret, mean(ret, dims=2)

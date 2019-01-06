@@ -49,7 +49,7 @@ function mean(ens::Vector{MaterialImage})
   ret = MaterialImage(zeros(size(ens[1].data)), ens[1].discs)
   for i in 1:length(ens)
     for j in 1:length(ens[1].data)
-      ret[j] += ens[i][j] / length(ens)
+      @inbounds ret[j] += ens[i][j] / length(ens)
     end
   end
   return ret

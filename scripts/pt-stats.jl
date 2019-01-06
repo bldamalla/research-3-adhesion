@@ -12,68 +12,35 @@ using Distributed
 
 # ensemble configuration index
 
-tk = @distributed for f in 1:64 ### START OF MAIN FOR LOOP
-
+tk = @distributed for f in 1:64
+  # compute only the variances caused by changing the different
+  # configurations in two pt stats
   conf = ARR_MATRIX[:,f]
   gg = sortperm(conf)
 
-  for i in 1:length(gg)
-    eval(Meta.parse("ens_$((i-1)%3+1)_$(conf[gg[i]]) = ENSEMBLES[$(gg[i])]"))
-  end
+  two_pt_arg = two_pt_ens[gg]
+  println("Initialized: ens config $(f)")
 
-  # collect all one point stats here
-  evone = Vector{Float64}()
-
-  # calculate the point statistics of the ensembles
-  @nexprs 3 i -> begin
-    @nexprs 4 j -> begin
-      one_pt_i_j = one_pt_stat(ens_i_j)
-      println("Calculated: 1-pt ($(f), $(i), $(j))")
-      two_pt_i_j, two_pt_i_j_ave = two_pt_stat(ens_i_j)
-      println("Calculated: 2-pt ($(f), $(i), $(j))")
-      push!(evone, one_pt_i_j)
-    end
-  end
-
-  # compare the point statistics of the ensembles
-  one_pt = bar(evone)
-  savefig(one_pt, "./plots/one_pt/evone_$(f).png")
-  println("Plotted: 1-pt ($(f))")
-
-  @nexprs 3 i -> begin
-    @nexprs 4 j -> begin
-      tpt_i_j = contour(-112:112, -112:112, reshape(two_pt_i_j_ave, 225, 225))
-      savefig(tpt_i_j, "./plots/two_pts/two_pt_$(i)_$(j)_$(f).png")
-      println("Plotted: 2-pt ($(f), $(i), $(j))")
-    end
-  end
-
-  # create the PCA models
   @nexprs 4 i -> begin
-    cmpr_i = hcat(two_pt_1_i, two_pt_2_i, two_pt_3_i)
-    mdl_i = fit(PCA, cmpr_i, maxoutdim=2)
+    cmpr_i = hcat(two_pt_arg[(i-1)*3+1], two_pt_arg[(i-1)*3+2], two_pt_arg[(i-1)*3+3])
+    mdl_i = fit(PCA, cmpr_i)
   end
 
-# create the plots and identify the variances
+  println("Calculated: PCA config $(f)")
+
   @nexprs 4 i -> begin
     val = transform(mdl_i, cmpr_i)
     if size(val, 1) == 1
-      val = vcat(val, zeros(180)')
+      val = vcat(val, zeros(450)')
     end
-    q = val[:,1:60]
-    scatter(val[2,1:60], val[1,1:60])
+    q = val[:,1:150]
     vars[(i-1)*3+1, f] = tr(q'q)
-    q = val[:,61:120]
-    scatter!(val[2,61:120], val[1,61:120])
+    q = val[:,151:300]
     vars[(i-1)*3+2, f] = tr(q'q)
-    q = val[:,121:180]
-    scatter!(val[2,121:180], val[1,121:180])
+    q = val[:,301:450]
     vars[(i-1)*3+3, f] = tr(q'q)
-
-    savefig("plots/PCA/mdl_$(f)_$(i).png")
-    println("Plotted: PCA ($(f), $(i))")
   end
 
-end ### END MAIN PLOT LOOP
+  println("Calculated: variances config $(f)")
 
-println(tk)
+end
