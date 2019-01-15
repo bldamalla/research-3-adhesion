@@ -12,6 +12,8 @@ include("../src/MaterialImage.jl")
 # extension generation function
 covv(a::Int) = (a >= 10) ? "0$(a)" : "00$(a)"
 
+ens = 200
+
 """
   Use the following images
 
@@ -65,7 +67,7 @@ function parse_load(arg::NTuple{3, Int})
 
   segment!(img)
 
-  return Ensemble(MaterialImage(img, 2); N=150, S=225)
+  return Ensemble(MaterialImage(img, 2); N=ens, S=225)
 end
 
 ENSEMBLES = map(parse_load, images)

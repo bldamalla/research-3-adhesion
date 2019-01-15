@@ -31,13 +31,13 @@ tk = @distributed for f in 1:64
   @nexprs 4 i -> begin
     val = transform(mdl_i, cmpr_i)
     if size(val, 1) == 1
-      val = vcat(val, zeros(450)')
+      val = vcat(val, zeros(3*ens)')
     end
-    q = val[:,1:150]
+    q = val[:,1:ens]
     vars[(i-1)*3+1, f] = tr(q'q)
-    q = val[:,151:300]
+    q = val[:,ens+1:2*ens]
     vars[(i-1)*3+2, f] = tr(q'q)
-    q = val[:,301:450]
+    q = val[:,2*ens+1:3*ens]
     vars[(i-1)*3+3, f] = tr(q'q)
   end
 

@@ -6,10 +6,12 @@ Include this in interactive state after `pt-stats` has finished
 
 s_vars = vec(sum(vars, dims=1))
 
-CF = sortperm(s_vars)[1]
+CF = sortperm(s_vars)[2]
 
 conf = ARR_MATRIX[:,CF]
 gg = sortperm(conf)
+
+println("Preferred orientation: $CF")
 
 evone_fin = evone[gg]
 two_pt_ens_fin = two_pt_ens[gg]
@@ -36,16 +38,18 @@ end
 @nexprs 4 i -> begin
   val = transform(mdl_i, cmpr_i)
   if size(val, 1) == 1
-    val = vcat(val, zeros(450)')
+    val = vcat(val, zeros(3*ens)')
   end
-  q = val[:,1:150]
-  scatter(q[1,:], q[2,:])
-  q = val[:,151:300]
-  scatter!(q[1,:], q[2,:])
-  q = val[:,301:450]
-  scatter!(q[1,:], q[2,:])
+  for j in 1:outdim(mdl_i)-1 for k in j+1:outdim(mdl_i)
+  q = val[:,1:ens]
+  scatter(q[j,:], q[k,:])
+  q = val[:,ens+1:2*ens]
+  scatter!(q[j,:], q[k,:])
+  q = val[:,2*ens+1:3*ens]
+  scatter!(q[j,:], q[k,:])
 
-  savefig("plots/PCA/scatter_$(i).png")
+  savefig("plots/PCA/scatter_$(i)_$(j)_$(k).png")
+  end end
 end
 
 bar(vars[[1,4,7,10],CF]); savefig("plots/R2/fin_1.png")
