@@ -33,7 +33,7 @@ tk = @distributed for f in 1:64
     if size(val, 1) == 1
       val = vcat(val, zeros(3*ens)')
     end
-    q = val[:,1:ens]
+    q = val[:,1:150]; centralize(q, mean)
     vars[(i-1)*3+1, f] = tr(q'q)
     q = val[:,ens+1:2*ens]
     vars[(i-1)*3+2, f] = tr(q'q)

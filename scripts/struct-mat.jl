@@ -127,3 +127,12 @@ for i in 1:12
   push!(two_pt_ens, ens)
   push!(two_pt_ave, vec(ave))
 end
+
+function centralize!(ctn::SubArray{T}, mat::SubArray{T}) where T <: AbstractFloat
+  μ = mean(mat, dims=2)
+  for i in 1:length(μ)
+    for j in 1:size(mat, 2)
+      ctn[i, j] = mat[i, j] - μ[i, 1]
+    end
+  end
+end

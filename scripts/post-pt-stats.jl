@@ -2,7 +2,7 @@
 Include this in interactive state after `pt-stats` has finished
 """
 
-# rmprocs(2, 3)
+rmprocs(2, 3)
 
 s_vars = vec(sum(vars, dims=1))
 
@@ -22,10 +22,10 @@ bar(evone_fin[[2,5,8,11]]); savefig("plots/one_pt/evone_2.png")
 bar(evone_fin[[3,6,9,12]]); savefig("plots/one_pt/evone_3.png")
 
 for i in 1:3
-  tf1 = contour(-112:112, -112:112, reshape(two_pt_ave_fin[0*3+i], 225, 225))
-  tf2 = contour(-112:112, -112:112, reshape(two_pt_ave_fin[1*3+i], 225, 225))
-  tf3 = contour(-112:112, -112:112, reshape(two_pt_ave_fin[2*3+i], 225, 225))
-  tf4 = contour(-112:112, -112:112, reshape(two_pt_ave_fin[3*3+i], 225, 225))
+  tf1 = contour(-220:220, -220:220, reshape(two_pt_ave_fin[0*3+i], 441, 441))
+  tf2 = contour(-220:220, -220:220, reshape(two_pt_ave_fin[1*3+i], 441, 441))
+  tf3 = contour(-220:220, -220:220, reshape(two_pt_ave_fin[2*3+i], 441, 441))
+  tf4 = contour(-220:220, -220:220, reshape(two_pt_ave_fin[3*3+i], 441, 441))
   plot(tf1, tf3, tf2, tf4)
   savefig("plots/two_pts/contour_$(i).png")
 end
@@ -47,7 +47,7 @@ end
   scatter!(q[j,:], q[k,:])
   q = val[:,2*ens+1:3*ens]
   scatter!(q[j,:], q[k,:])
-
+  
   savefig("plots/PCA/scatter_$(i)_$(j)_$(k).png")
   end end
 end
